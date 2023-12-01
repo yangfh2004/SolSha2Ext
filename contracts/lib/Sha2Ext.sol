@@ -3,17 +3,7 @@ pragma solidity 0.8.15;
 import { LibBytes } from "./LibBytes.sol";
 
 library Sha2Ext {
-    function sha384(bytes memory message) internal pure returns (bytes32, bytes16) {
-        uint64[8] memory h = [
-            0xcbbb9d5dc1059ed8,
-            0x629a292a367cd507,
-            0x9159015a3070dd17,
-            0x152fecd8f70e5939,
-            0x67332667ffc00b31,
-            0x8eb44a8768581511,
-            0xdb0c2e0d64f98fa7,
-            0x47b5481dbefa4fa4
-        ];
+    function sha2(bytes memory message, uint64[8] memory h) internal pure {
         uint64[80] memory k = [
             0x428a2f98d728ae22,
             0x7137449123ef65cd,
@@ -136,9 +126,41 @@ library Sha2Ext {
                 }
             }
         }
+    }
+
+    function sha384(bytes memory message) internal pure returns (bytes32, bytes16) {
+        uint64[8] memory h = [
+            0xcbbb9d5dc1059ed8,
+            0x629a292a367cd507,
+            0x9159015a3070dd17,
+            0x152fecd8f70e5939,
+            0x67332667ffc00b31,
+            0x8eb44a8768581511,
+            0xdb0c2e0d64f98fa7,
+            0x47b5481dbefa4fa4
+        ];
+        sha2(message, h);
         return (
             bytes32(abi.encodePacked(bytes8(h[0]), bytes8(h[1]), bytes8(h[2]), bytes8(h[3]))),
             bytes16(abi.encodePacked(bytes8(h[4]), bytes8(h[5])))
+        );
+    }
+
+    function sha512(bytes memory message) internal pure returns (bytes32, bytes32) {
+        uint64[8] memory h = [
+            0x6a09e667f3bcc908,
+            0xbb67ae8584caa73b,
+            0x3c6ef372fe94f82b,
+            0xa54ff53a5f1d36f1,
+            0x510e527fade682d1,
+            0x9b05688c2b3e6c1f,
+            0x1f83d9abfb41bd6b,
+            0x5be0cd19137e2179
+        ];
+        sha2(message, h);
+        return (
+            bytes32(abi.encodePacked(bytes8(h[0]), bytes8(h[1]), bytes8(h[2]), bytes8(h[3]))),
+            bytes32(abi.encodePacked(bytes8(h[4]), bytes8(h[5]), bytes8(h[6]), bytes8(h[7])))
         );
     }
 
