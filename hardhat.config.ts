@@ -1,12 +1,12 @@
 import "@nomicfoundation/hardhat-toolbox";
 import { config as dotenvConfig } from "dotenv";
 import "hardhat-deploy";
+import "hardhat-gas-reporter";
 import type { HardhatUserConfig } from "hardhat/config";
 import type { NetworkUserConfig } from "hardhat/types";
 import { resolve } from "path";
 
 import "./tasks/accounts";
-import "./tasks/greet";
 import "./tasks/taskDeploy";
 
 const dotenvConfigPath: string = process.env.DOTENV_CONFIG_PATH || "./.env";
@@ -79,6 +79,8 @@ const config: HardhatUserConfig = {
   gasReporter: {
     currency: "USD",
     enabled: process.env.REPORT_GAS ? true : false,
+    coinmarketcap: process.env.COINMARKETCAP_API_KEY || "", //to fetch gas data
+    token: "ETH",
     excludeContracts: [],
     src: "./contracts",
   },
@@ -112,7 +114,7 @@ const config: HardhatUserConfig = {
     tests: "./test",
   },
   solidity: {
-    version: "0.8.19",
+    version: "0.8.15",
     settings: {
       metadata: {
         // Not including the metadata hash
@@ -121,9 +123,16 @@ const config: HardhatUserConfig = {
       },
       // Disable the optimizer when debugging
       // https://hardhat.org/hardhat-network/#solidity-optimizer-support
+      viaIR: true,
       optimizer: {
         enabled: true,
-        runs: 800,
+        runs: 10000,
+        details: {
+          yul: true,
+          deduplicate: true,
+          cse: true,
+          constantOptimizer: true,
+        },
       },
     },
   },
