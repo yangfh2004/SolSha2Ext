@@ -1,61 +1,27 @@
-# Hardhat Template [![Open in Gitpod][gitpod-badge]][gitpod] [![Github Actions][gha-badge]][gha] [![Hardhat][hardhat-badge]][hardhat] [![License: MIT][license-badge]][license]
+# Solidity SHA2 Extension [![Hardhat][hardhat-badge]][hardhat] [![License: MIT][license-badge]][license]
 
-[gitpod]: https://gitpod.io/#https://github.com/paulrberg/hardhat-template
-[gitpod-badge]: https://img.shields.io/badge/Gitpod-Open%20in%20Gitpod-FFB45B?logo=gitpod
-[gha]: https://github.com/paulrberg/hardhat-template/actions
-[gha-badge]: https://github.com/paulrberg/hardhat-template/actions/workflows/ci.yml/badge.svg
 [hardhat]: https://hardhat.org/
 [hardhat-badge]: https://img.shields.io/badge/Built%20with-Hardhat-FFDB1C.svg
 [license]: https://opensource.org/licenses/MIT
 [license-badge]: https://img.shields.io/badge/License-MIT-blue.svg
 
-A Hardhat-based template for developing Solidity smart contracts, with sensible defaults.
+This solidity library provides implementations of SHA384 and SHA512 as an extension of SHA2 on Solidity.
 
-- [Hardhat](https://github.com/nomiclabs/hardhat): compile, run and test smart contracts
-- [TypeChain](https://github.com/ethereum-ts/TypeChain): generate TypeScript bindings for smart contracts
-- [Ethers](https://github.com/ethers-io/ethers.js/): renowned Ethereum library and wallet implementation
-- [Solhint](https://github.com/protofire/solhint): code linter
-- [Solcover](https://github.com/sc-forks/solidity-coverage): code coverage
-- [Prettier Plugin Solidity](https://github.com/prettier-solidity/prettier-plugin-solidity): code formatter
+The `sha256` is a pre-compiled contract which is very gas-efficient. However, the methods `sha384` and `sha512` in this
+library will consume significant amounts of gas as measured in the below charts. I recommend that use it only if you
+have to and deploy it on low-cost layer-2 networks or side-chains rather the Ethereum layer 1 (e.g. the same contract,
+which cost more than $200 gas on Eth Layer 1, only cost 10 cents on Polygon and 60 cents on Optimism).
 
-## Getting Started
-
-Click the [`Use this template`](https://github.com/paulrberg/hardhat-template/generate) button at the top of the page to
-create a new repository with this repo as the initial state.
-
-## Features
-
-This template builds upon the frameworks and libraries mentioned above, so for details about their specific features,
-please consult their respective documentations.
-
-For example, for Hardhat, you can refer to the [Hardhat Tutorial](https://hardhat.org/tutorial) and the
-[Hardhat Docs](https://hardhat.org/docs). You might be in particular interested in reading the
-[Testing Contracts](https://hardhat.org/tutorial/testing-contracts) section.
-
-### Sensible Defaults
-
-This template comes with sensible default configurations in the following files:
-
-```text
-├── .editorconfig
-├── .eslintignore
-├── .eslintrc.yml
-├── .gitignore
-├── .prettierignore
-├── .prettierrc.yml
-├── .solcover.js
-├── .solhint.json
-└── hardhat.config.ts
-```
+You are also welcome to submit PR and issues to optimize the solidity code and save gas!
 
 ### VSCode Integration
 
-This template is IDE agnostic, but for the best user experience, you may want to use it in VSCode alongside Nomic
+This project is IDE agnostic, but for the best user experience, you may want to use it in VSCode alongside Nomic
 Foundation's [Solidity extension](https://marketplace.visualstudio.com/items?itemName=NomicFoundation.hardhat-solidity).
 
 ### GitHub Actions
 
-This template comes with GitHub Actions pre-configured. Your contracts will be linted and tested on every push and pull
+This project comes with GitHub Actions pre-configured. Your contracts will be linted and tested on every push and pull
 request made to the `main` branch.
 
 Note though that to make this work, you must use your `INFURA_API_KEY` and your `MNEMONIC` as GitHub secrets.
@@ -98,6 +64,30 @@ Run the tests with Hardhat:
 
 ```sh
 $ pnpm test
+```
+
+The tests will compare the results of the solidity library with the `crypto` library of JavaScript.
+
+The gas consumption is measured for each test and SHA256 gas consumption is measured as a baseline.
+
+```
+--------------------------|---------------------------|---------------|-----------------------------·
+|   Solc version: 0.8.15   ·  Optimizer enabled: true  ·  Runs: 10000  ·  Block limit: 30000000 gas  │
+···························|···························|···············|······························
+|  Methods                 ·                35 gwei/gas                ·       2098.87 usd/eth       │
+·············|·············|·············|·············|···············|···············|··············
+|  Contract  ·  Method     ·  Min        ·  Max        ·  Avg          ·  # calls      ·  usd (avg)  │
+·············|·············|·············|·············|···············|···············|··············
+|  TestSha2  ·  sha256Gas  ·      44115  ·      77948  ·        61032  ·            2  ·       4.48  │
+·············|·············|·············|·············|···············|···············|··············
+|  TestSha2  ·  sha384Gas  ·     212575  ·    2843972  ·      1528274  ·            2  ·     112.27  │
+·············|·············|·············|·············|···············|···············|··············
+|  TestSha2  ·  sha512Gas  ·     212624  ·    2844021  ·      1528323  ·            2  ·     112.27  │
+·············|·············|·············|·············|···············|···············|··············
+|  Deployments             ·                                           ·  % of limit   ·             │
+···························|·············|·············|···············|···············|··············
+|  TestSha2                ·          -  ·          -  ·      1386697  ·        4.6 %  ·     101.87  │
+·--------------------------|-------------|-------------|---------------|---------------|-------------·
 ```
 
 ### Lint Solidity
@@ -150,20 +140,12 @@ $ pnpm deploy:contracts
 
 ### Tasks
 
-#### Deploy Greeter
+#### Deploy Test Contract
 
-Deploy a new instance of the Greeter contract via a task:
-
-```sh
-$ pnpm task:deployGreeter --network ganache --greeting "Bonjour, le monde!"
-```
-
-#### Set Greeting
-
-Run the `setGreeting` task on the Ganache network:
+Deploy a new instance of the TestSha2 contract via a task:
 
 ```sh
-$ pnpm task:setGreeting --network ganache --greeting "Bonjour, le monde!" --account 3
+$ pnpm task:deployTestSha2 --network ganache"
 ```
 
 ## Tips
